@@ -32,4 +32,8 @@ int platform_wifi_power_on(void)
 void platform_wifi_power_off(void)
 {
 }
+int rockchip_wifi_power(int on) { return 0; }
+int rockchip_wifi_set_carddetect(int val) { return 0; }
+int rockchip_wifi_get_oob_irq(void) { return 0; }
+int rockchip_wifi_mac_addr(unsigned char *buf) { return -1; }
 #endif /* !CONFIG_PLATFORM_OPS */

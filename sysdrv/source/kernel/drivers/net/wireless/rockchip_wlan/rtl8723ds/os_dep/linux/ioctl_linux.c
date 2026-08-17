@@ -8065,7 +8065,7 @@ static int rtw_wowlan_set_pattern(struct net_device *dev,
 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
 	struct wowlan_ioctl_param poidparam;
 	int ret = 0;
-	u8 input[wrqu->data.length];
+	u8 *input = NULL;
 	u8 index = 0;
 
 	poidparam.subcode = 0;
@@ -8083,6 +8083,11 @@ static int rtw_wowlan_set_pattern(struct net_device *dev,
 		goto _rtw_wowlan_set_pattern_exit;
 	} else {
 		/* set pattern */
+		input = kzalloc(wrqu->data.length, GFP_KERNEL);
+		if (input == NULL) {
+			ret = -ENOMEM;
+			goto _rtw_wowlan_set_pattern_exit;
+		}
 		if (copy_from_user(input,
 				   wrqu->data.pointer, wrqu->data.length))
 			return -EFAULT;
@@ -8120,6 +8125,7 @@ static int rtw_wowlan_set_pattern(struct net_device *dev,
 		rtw_ps_deny_cancel(padapter, PS_DENY_IOCTL);
 	}
 _rtw_wowlan_set_pattern_exit:
+	kfree(input);
 	return ret;
 }
 #endif /* CONFIG_WOWLAN */

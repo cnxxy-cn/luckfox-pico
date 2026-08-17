@@ -16,6 +16,7 @@
 #define _RTL8723DS_XMIT_C_
 
 #include <rtl8723d_hal.h>
+#include <uapi/linux/sched/types.h>
 
 static u8 rtw_sdio_wait_enough_TxOQT_space(PADAPTER padapter, u8 agg_num)
 {

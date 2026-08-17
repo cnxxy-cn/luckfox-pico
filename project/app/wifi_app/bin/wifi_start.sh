@@ -34,6 +34,11 @@ if [ $? -eq 0 ];then
 	wpa_supplicant -B -i wlan0 -c $CONF
 fi
 
+cat /sys/bus/sdio/devices/*/uevent | grep "024C:D723"
+if [ $? -eq 0 ];then
+	wpa_supplicant -B -i wlan0 -c $CONF
+fi
+
 #rtl8188fu
 cat /sys/bus/usb/devices/*/uevent | grep "bda\/f179"
 if [ $? -eq 0 ];then
