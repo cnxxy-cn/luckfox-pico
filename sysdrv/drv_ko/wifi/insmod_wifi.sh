@@ -60,6 +60,13 @@ if [ $? -eq 0 ]; then
 	insmod 8723ds.ko
 fi
 
+#esp-hosted
+cat /sys/bus/sdio/devices/*/uevent 2>/dev/null | grep -E "0092:(6666|7777)"
+if [ $? -eq 0 ]; then
+	insmod cfg80211.ko
+	insmod esp32_sdio.ko
+fi
+
 #rtl8189fs
 cat /sys/bus/sdio/devices/*/uevent | grep "024C:F179"
 if [ $? -eq 0 ]; then

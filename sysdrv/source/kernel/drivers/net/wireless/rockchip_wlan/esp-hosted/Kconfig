@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: GPL-2.0
+config ESP_HOSTED_SDIO
+	tristate "ESP-Hosted: Espressif ESP32 WiFi over SDIO"
+	depends on MMC
+	select CFG80211
+	help
+	  Host driver for the ESP-Hosted NG firmware running on an Espressif
+	  ESP32-C6 (also C5/C61) attached over SDIO.
+
+	  Provides a cfg80211 WiFi interface (wlan0) plus a raw custom data
+	  channel exposed to user space as /dev/esp_custom.
+
+	  Note: this is cfg80211-only - it implements cfg80211_ops directly and
+	  does not use mac80211.
+
+	  The ESP side must be running matching esp-hosted NG firmware; the
+	  driver rejects a firmware whose version does not match the host.
+
+if ESP_HOSTED_SDIO
+
+config ESP_HOSTED_AP_MODE
+	bool "Enable SoftAP (access point) support"
+	default y
+	help
+	  Compile in the SoftAP code paths. The ESP firmware must also be
+	  built with SoftAP support, otherwise AP mode commands are rejected
+	  at runtime.
+
+endif # ESP_HOSTED_SDIO
+

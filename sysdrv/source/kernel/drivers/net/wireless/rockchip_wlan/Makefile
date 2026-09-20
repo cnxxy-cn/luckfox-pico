@@ -3,3 +3,4 @@ obj-$(CONFIG_BCMDHD)	+= rkwifi/
 obj-$(CONFIG_CYW_BCMDHD)	+= cywdhd/
 obj-$(CONFIG_INFINEON_DHD)	+= infineon/
 obj-$(CONFIG_RTL8723DS)	+= rtl8723ds/
+obj-$(CONFIG_ESP_HOSTED_SDIO) += esp-hosted/
