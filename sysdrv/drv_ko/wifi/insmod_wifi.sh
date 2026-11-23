@@ -60,8 +60,8 @@ if [ $? -eq 0 ]; then
 	insmod 8723ds.ko
 fi
 
-#esp-hosted
-cat /sys/bus/sdio/devices/*/uevent 2>/dev/null | grep -E "0092:(6666|7777)"
+#esp-hosted: ESP32 (ESP32-MINI-1/1U) 6666:2222/3333, ESP32-C5/C6/C61 0092:6666/7777
+cat /sys/bus/sdio/devices/*/uevent 2>/dev/null | grep -E "6666:(2222|3333)|0092:(6666|7777)"
 if [ $? -eq 0 ]; then
 	insmod cfg80211.ko
 	insmod esp32_sdio.ko
@@ -136,3 +136,4 @@ if ifconfig wlan0 2>&1 | grep -q "not found"; then
 else
 	rkwifi_server start >/dev/null 2>&1 &
 fi
+

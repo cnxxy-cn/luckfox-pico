@@ -27,9 +27,10 @@
  * Largest payload a single write() may carry.
  *
  * The SDIO transport caps a whole frame (payload + esp_payload_header) at
- * ESP_RX_BUFFER_SIZE - sizeof(header) = 15860 bytes, and the ESP firmware
- * aggregates RX frames into a fixed RX_BUF_SIZE buffer, so staying at a
- * conventional MTU keeps every frame on the simple non-fragmented path.
+ * the slave RX buffer size - sizeof(header): 15860 bytes on C5/C6/C61,
+ * 3572 on ESP32. The ESP firmware aggregates RX frames into that fixed
+ * buffer, so staying at a conventional MTU keeps every frame on the simple
+ * non-fragmented path.
  * At the intended 10-20 KB/s this is never the bottleneck.
  */
 #define ESP_CUSTOM_MAX_FRAME    1500
@@ -53,3 +54,4 @@ void esp_custom_deinit(void);
 void esp_custom_rx(struct sk_buff *skb);
 
 #endif /* __esp_custom_h_ */
+

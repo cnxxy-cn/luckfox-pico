@@ -630,9 +630,28 @@ static struct sk_buff *read_packet(struct esp_adapter *adapter)
 	return skb_dequeue(&(context->rx_q));
 }
 
+/*
+ * Largest host->ESP CMD53 write. The firmware de-aggregates each slave RX
+ * buffer on its own, so a write must never span two buffers. The buffer size
+ * comes from the ESP_BOOTUP_RX_BUF_SIZE TLV: ESP32 (e.g. ESP32-MINI-1U) =
+ * 3584, C5/C6/C61 = 15872. It arrives after tx_process() has started, so it
+ * must be re-read rather than latched once. Kept a multiple of ESP_BLOCK_SIZE
+ * so the block padding in tx_process() stays inside the buffer.
+ */
+static u32 esp_get_tx_aggr_size(struct esp_adapter *adapter)
+{
+	u32 size = READ_ONCE(adapter->tx_aggr_size);
+
+	size -= size % ESP_BLOCK_SIZE;
+	if (!size || size > ESP_HOST_TX_AGGR_SIZE)
+		size = ESP_HOST_TX_AGGR_SIZE;
+
+	return size;
+}
+
 static int write_packet(struct esp_adapter *adapter, struct sk_buff *skb)
 {
-	u32 max_pkt_size = ESP_RX_BUFFER_SIZE - sizeof(struct esp_payload_header);
+	u32 max_pkt_size;
 	struct esp_payload_header *payload_header = (struct esp_payload_header *) skb->data;
 	struct esp_skb_cb *cb = NULL;
 	uint8_t prio = PRIO_Q_LOW;
@@ -657,6 +676,7 @@ static int write_packet(struct esp_adapter *adapter, struct sk_buff *skb)
 		return -ENODEV;
 	}
 
+	max_pkt_size = esp_get_tx_aggr_size(adapter) - sizeof(struct esp_payload_header);
 	if (skb->len > max_pkt_size) {
 		esp_err("Drop pkt of len[%u] > max SDIO transport len[%u]\n",
 				skb->len, max_pkt_size);
@@ -757,8 +777,7 @@ static int tx_process(void *data)
 	u32 tx_aggr_size;
 
 	context = adapter->if_context;
-	tx_aggr_size = adapter->tx_aggr_size ? adapter->tx_aggr_size : ESP_HOST_TX_AGGR_SIZE;
-	aggr_buf = kzalloc(tx_aggr_size, GFP_KERNEL);
+	aggr_buf = kzalloc(ESP_HOST_TX_AGGR_SIZE, GFP_KERNEL);
 	if (!aggr_buf)
 		return -ENOMEM;
 
@@ -775,6 +794,8 @@ static int tx_process(void *data)
 			msleep(100);
 			continue;
 		}
+
+		tx_aggr_size = esp_get_tx_aggr_size(adapter);
 
 #ifdef ESP_DEBUG_STATS
 		aggr_start = ktime_get();
@@ -1226,4 +1247,5 @@ void esp_deinit_interface_layer(void)
 {
 	sdio_unregister_driver(&esp_sdio_driver);
 }
+
 

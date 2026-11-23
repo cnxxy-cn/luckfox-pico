@@ -5,7 +5,8 @@ config ESP_HOSTED_SDIO
 	select CFG80211
 	help
 	  Host driver for the ESP-Hosted NG firmware running on an Espressif
-	  ESP32-C6 (also C5/C61) attached over SDIO.
+	  ESP32 (e.g. ESP32-MINI-1/1U, SDIO ID 6666:2222/3333) or ESP32-C6
+	  (also C5/C61, SDIO ID 0092:6666/7777) attached over SDIO.
 
 	  Provides a cfg80211 WiFi interface (wlan0) plus a raw custom data
 	  channel exposed to user space as /dev/esp_custom.
@@ -27,4 +28,5 @@ config ESP_HOSTED_AP_MODE
 	  at runtime.
 
 endif # ESP_HOSTED_SDIO
+
 

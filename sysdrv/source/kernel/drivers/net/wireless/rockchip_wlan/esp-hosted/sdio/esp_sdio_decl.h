@@ -36,7 +36,10 @@
 
 #define ESP_TX_BUFFER_MASK             0xFFF
 #define ESP_TX_BUFFER_MAX              0x1000
-#define ESP_MAX_BUF_CNT                10
+/* Most slave RX buffers the host will use: get_firmware_data() keeps
+ * min(slave token count, ESP_MAX_BUF_CNT) as initial credits. Must be >= the
+ * firmware RX_BUF_NUM (ESP32 16, C5/C6/C61 4) or the extra buffers sit idle. */
+#define ESP_MAX_BUF_CNT                16
 
 #define ESP_SLAVE_SLCHOST_BASE         0x3FF55000
 
@@ -101,3 +104,4 @@ struct esp_sdio_context {
 };
 
 #endif
+
